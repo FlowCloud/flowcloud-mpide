@@ -49,6 +49,14 @@
 
 #include <p32xxxx.h>
 #include <sys/attribs.h>
+#ifdef _FLOWCLOUD_
+#include <flow/core/flow_timer.h>
+typedef void *FlowThread;
+extern unsigned int FlowThread_SleepMilliseconds(FlowThread self, uint milliseconds);
+
+extern uint FlowTimer_GetTickCount(void);
+extern uint FlowTimer_GetTicksPerSecond(void);
+#endif
 
 #define	OPT_SYSTEM_INTERNAL
 #define OPT_BOARD_INTERNAL	//pull in internal symbol definitons
@@ -100,10 +108,18 @@ uint32_t (*gSoftPWMServoUpdate)(void) = NULL;
 uint8_t ppsGlobalLock = false;
 
 //************************************************************************
+#ifdef _FLOWCLOUD_
+unsigned long sketch_start = 0;
+unsigned long millis()
+{
+	return (FlowTimer_GetTickCount() * 1000) / FlowTimer_GetTicksPerSecond() - sketch_start;
+}
+#else
 unsigned long millis()
 {
 	return(gTimer0_millis);
 }
+#endif
 
 //************************************************************************
 // Read the CoreTimer register, which counts up at a rate of 40MHz
@@ -134,6 +150,12 @@ unsigned long micros()
 
 //************************************************************************
 // Delay for a given number of milliseconds.
+#ifdef _FLOWCLOUD_
+void delay(unsigned long ms)
+{
+	FlowThread_SleepMilliseconds(NULL, ms);
+}
+#else
 void delay(unsigned long ms)
 {
 unsigned long	startMillis;
@@ -145,6 +167,7 @@ unsigned long	startMillis;
 		_scheduleTask();
 	}
 }
+#endif
 
 //************************************************************************
 //*	Delay for the given number of microseconds. Will fail on micros()
@@ -163,6 +186,10 @@ unsigned long	startMicros	=	micros();
 //************************************************************************
 void init()
 {
+	#ifdef _FLOWCLOUD_
+	__PIC32_pbClk = getPeripheralClock();
+	sketch_start = millis();
+	#else
 
 #if defined(DEAD)
 #ifdef _ENABLE_PIC_RTC_
@@ -237,6 +264,8 @@ void	_board_init(void);
 	uart = (p32_uart *)_SER0_BASE;
 	uart->uxMode.clr = (1 << _UARTMODE_ON);
 #endif
+
+	#endif
 }
 
 //************************************************************************
