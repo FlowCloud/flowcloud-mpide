@@ -19,7 +19,7 @@ chipkit_WiFire_Flow.compiler.c.elf.flags=-O1::-Wl,--defsym,_min_heap_size=300000
 
 chipkit_WiFire_Flow.upload.protocol=stk500v2
 chipkit_WiFire_Flow.upload.maximum_size=7520192
-chipkit_WiFire_Flow.upload.speed=115200
+chipkit_WiFire_Flow.upload.speed=3000000
 
 chipkit_WiFire_Flow.bootloader.low_fuses=0xff
 chipkit_WiFire_Flow.bootloader.high_fuses=0xdd

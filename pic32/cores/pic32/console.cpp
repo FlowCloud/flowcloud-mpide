@@ -148,7 +148,11 @@ char _SYS_CONSOLE_GETC()
 	char c = '\0';
 	if (g_EnableConsole && g_EnableConsoleInput)
 	{
-		c = Serial_read();
+		int ci = -1;
+		do {
+			ci = Serial_read();
+		} while (ci == -1);
+		c = ci;
 	}
 	return c;
 }

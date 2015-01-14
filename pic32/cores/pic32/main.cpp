@@ -141,18 +141,13 @@ extern "C" {
 
 void Arduino_AppTask(FlowThread thread, void *taskParameters)
 {
-	init();
-	Serial.begin(115200);
-	g_EnableConsole = true;
-	g_EnableConsoleInput = true;
-
 	_SYS_CONSOLE_PRINT("Initialising Flow connection\r\n");
 	Initialise_Flow();
 
 	_SYS_CONSOLE_PRINT("\n\r\n\r----------------------------------------------");
 	_SYS_CONSOLE_PRINT("\n\rFlow Android App booting completed. Running...\n\r");
 	_SYS_CONSOLE_PRINT("\n\r\n\r\n\r");
-	delay(20);
+	//delay(20);
 
 	Serial.end();
 	g_EnableConsole = false;
@@ -182,6 +177,13 @@ int main(void)
 	digitalWrite(PIN_LED2, LOW);
 	digitalWrite(PIN_LED3, HIGH);
 	digitalWrite(PIN_LED4, LOW);
+
+	init();
+	Serial.begin(115200);
+	g_EnableConsole = true;
+	g_EnableConsoleInput = true;
+
+	_SYS_CONSOLE_PRINT("System booting - Initialising appcore\r\n");
 
 	return APPCORE_init(&info);
 }
