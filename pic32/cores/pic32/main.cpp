@@ -39,18 +39,6 @@
 
 #include <System_Defs.h>
 
-#ifdef _FLOWCLOUD_
-#include "app.h"
-#include "console.h"
-#include <flow/core/flow_threading.h>
-#include <flow/core/flow_timer.h>
-#include <flow/app/system_command.h>
-extern "C" 
-{
-	#include <flow/core/flow_memalloc.h>
-}
-#endif
-
 #if (ARDUINO >= 100)
 	#include <Arduino.h>
 #else
@@ -64,6 +52,19 @@ __attribute__((section(".comment"))) void (*__use_force_isr_install)(void) = &__
 
 
 #ifdef _FLOWCLOUD_
+
+#include "app.h"
+#include "console.h"
+
+#include <flow/core/flow_threading.h>
+#include <flow/core/flow_timer.h>
+#include <flow/app/system_command.h>
+extern "C" 
+{
+	#include <flow/core/flow_memalloc.h>
+	#include <flow/core/flow_time.h>
+}
+
 void * operator new(size_t n)
 {
 #ifdef DEBUG_MEMORY
@@ -81,7 +82,9 @@ void operator delete(void * p) throw()
 
 extern "C" {
 
-	// Interrupts for harmony
+	//************************************************************************
+	// Interrupts required by APPCORE. These cannot be defined in a static library
+	//************************************************************************
 
 	void APPCORE_InterruptHandler_MRF24W_Ext4(void);
 	void APPCORE_InterruptHandler_ETHMAC(void);
@@ -108,10 +111,10 @@ extern "C" {
 	    APPCORE_InterruptHandler_NVM();
 	}
 
-	
-	#include <flow/core/flow_time.h>
-
-	// definitions from libappbase that we can't include due to their dependencies
+	//************************************************************************
+	// definitions for required functions from libappbase that themselves have
+	// dependencies we can't meet (i.e. harmony drivers)
+	//************************************************************************
 
 	typedef bool (*AppBase_ResetHandler)(bool resetToConfigurationMode);
 
@@ -128,6 +131,10 @@ extern "C" {
 	// assuming configUSE_16_BIT_TICKS == 0
 	void vTaskDelay( const uint32_t xTicksToDelay );
 
+	//************************************************************************
+	// Implement required functions for libappbase
+	//************************************************************************
+
 	int CommandShow(_CMDIO_DEV_NODE* pCmdIO, int argc, char** argv){
 		_SYS_CONSOLE_PRINT("CommandShow(...) squelched\r\n");
 	}
@@ -136,6 +143,63 @@ extern "C" {
 		// can we use executeSoftReset from wiring.c
 		_SYS_CONSOLE_PRINT("CommandHandlers_ResetHandler(resetToConfigurationMode = %s) squelched\r\n", resetToConfigurationMode ? "true" : "false");
 	}
+
+
+	//************************************************************************
+	// Intercept UI task's access to the LEDs to Arduino can have full controll
+	//************************************************************************
+
+	bool g_EnableUIControlLED = false;
+
+	typedef enum
+	{
+		UILEDState_Off = 0,
+		UILEDState_On
+	} UILEDState;
+
+	typedef enum
+	{
+		UILEDMode_Manual = 0,
+		UILEDMode_Off,
+		UILEDMode_On,
+		UILEDMode_FlashStartOn,
+		UILEDMode_FlashStartOff,
+		UILEDMode_Max,
+	} UILEDMode;
+
+	bool __real_UIControl_SetLEDMode(uint8_t led, UILEDMode newMode);
+	bool __real_UIControl_SetLEDState(uint8_t led, UILEDState newMode);
+	void __real_UIControl_UIStep(void);
+
+	bool __wrap_UIControl_SetLEDMode(uint8_t led, UILEDMode newMode)
+	{
+		bool result = false;
+		if (g_EnableUIControlLED)
+		{
+			result = __real_UIControl_SetLEDMode(led, newMode);
+		}
+		return result;
+	}
+
+	bool __wrap_UIControl_SetLEDState(uint8_t led, UILEDState newMode)
+	{
+		bool result = false;
+		if (g_EnableUIControlLED)
+		{
+			result = __real_UIControl_SetLEDState(led, newMode);
+		}
+		return result;
+	}
+
+	void __wrap_UIControl_UIStep(void)
+	{
+		if (g_EnableUIControlLED)
+		{
+			__real_UIControl_UIStep();
+		}
+	}
+
+
 
 }
 
@@ -147,11 +211,19 @@ void Arduino_AppTask(FlowThread thread, void *taskParameters)
 	_SYS_CONSOLE_PRINT("\n\r\n\r----------------------------------------------");
 	_SYS_CONSOLE_PRINT("\n\rFlow Android App booting completed. Running...\n\r");
 	_SYS_CONSOLE_PRINT("\n\r\n\r\n\r");
-	//delay(20);
+	delay(20);
 
 	Serial.end();
 	g_EnableConsole = false;
 	g_EnableConsoleInput = false;
+	g_EnableUIControlLED = false;
+
+	delay(10);
+
+	digitalWrite(PIN_LED1, LOW);
+	digitalWrite(PIN_LED2, LOW);
+	digitalWrite(PIN_LED3, LOW);
+	digitalWrite(PIN_LED4, LOW);
 
 	setup();
 	
@@ -185,6 +257,7 @@ int main(void)
 
 	_SYS_CONSOLE_PRINT("System booting - Initialising appcore\r\n");
 
+	g_EnableUIControlLED = true;
 	return APPCORE_init(&info);
 }
 
