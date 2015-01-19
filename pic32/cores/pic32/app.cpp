@@ -72,20 +72,17 @@ void MessageReceived (FlowMessagingMessage message)
 	char *otherCommandsResponse = NULL;
 	// Setup xml parser to buld tree to navigate
 	// run the parser, find what type of command it was
-	_SYS_CONSOLE_PRINT("* TreeNode_ParseXML((uint8_t*) content, contentLength, true)\r\n");
 	TreeNode rootNode = TreeNode_ParseXML((uint8_t*) content, contentLength, true);
 	if (rootNode)
 	{
 		// Check whether the command was for us
-		_SYS_CONSOLE_PRINT("* TreeNode_Navigate(rootNode, \"command/to\")\r\n");
 		TreeNode node = TreeNode_Navigate(rootNode, "command/to");
-		_SYS_CONSOLE_PRINT("* TreeNode_GetValue(node)\r\n");
 		char* cmdTo = (char*) TreeNode_GetValue(node);
 		if (node && strcmp(g_DeviceAoR, cmdTo) == 0)
 		{			
 			char *cmdFrom = NULL, *cmdRequestID = NULL, *cmdRequestClientID = NULL, *cmdDetails = NULL;
+			TreeNode cmdParams = NULL;
 
-			_SYS_CONSOLE_PRINT("* TreeNode_Navigate(rootNode, \"command/from\")\r\n");
 			node = TreeNode_Navigate(rootNode, "command/from");
 			if(node)
 				cmdFrom = (char*) TreeNode_GetValue(node);
@@ -99,19 +96,25 @@ void MessageReceived (FlowMessagingMessage message)
 				cmdRequestClientID = (char*) TreeNode_GetValue(node);
 
 			node = TreeNode_Navigate(rootNode, "command/details");
+			if (!node) 
+				node = TreeNode_Navigate(rootNode, "command/commandtype"); // allow commandtype instead of details as the name
 			if(node)
 				cmdDetails = (char*) TreeNode_GetValue(node);
 
-			_SYS_CONSOLE_PRINT("* cmdTo = %s\r\n", cmdTo);
+			node = TreeNode_Navigate(rootNode, "command/commandparams");
+			if(node)
+				cmdParams = (char*) TreeNode_GetValue(node);
+
+
+			/*_SYS_CONSOLE_PRINT("* cmdTo = %s\r\n", cmdTo);
 			_SYS_CONSOLE_PRINT("* cmdFrom = %s\r\n", cmdFrom);
 			_SYS_CONSOLE_PRINT("* cmdRequestID = %s\r\n", cmdRequestID);
 			_SYS_CONSOLE_PRINT("* cmdRequestClientID = %s\r\n", cmdRequestClientID);
-			_SYS_CONSOLE_PRINT("* cmdDetails = %s\r\n", cmdDetails);
+			_SYS_CONSOLE_PRINT("* cmdDetails = %s\r\n", cmdDetails);*/
 
 
 			if (cmdTo && cmdFrom && cmdRequestID && cmdRequestClientID && cmdDetails)
 			{
-				_SYS_CONSOLE_PRINT("* ALL GOOD - responding\r\n");
 				XMLNode response("response");
 				{
 					XMLNode &sent = response.addChild("sent");
@@ -143,7 +146,17 @@ void MessageReceived (FlowMessagingMessage message)
 
 				XMLNode &responseparameters = response.addChild("responseparameters");
 
-				if (FlowCommandHandler.handleCommand(cmdDetails, responseparameters))
+				ReadableXMLNode *paramsNode;
+				if (cmdParams)
+				{
+					paramsNode = new ReadableXMLNode(cmdParams);
+				} 
+				else
+				{
+					paramsNode = new ReadableXMLNode("responseparameters");
+				}
+
+				if (FlowCommandHandler.handleCommand(cmdDetails, *paramsNode, responseparameters))
 				{
 					responsecode.setContent("OK");
 				} 
@@ -151,6 +164,8 @@ void MessageReceived (FlowMessagingMessage message)
 				{
 					responsecode.setContent("UNKNOWN_COMMAND");
 				}
+
+				delete paramsNode;
 
 				StringBuilder responseStringBuilder = StringBuilder_New(512);
 				responseStringBuilder = StringBuilder_Append(responseStringBuilder, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>");

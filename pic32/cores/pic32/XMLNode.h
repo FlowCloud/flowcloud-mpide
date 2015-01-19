@@ -11,6 +11,7 @@
 extern "C" {
 	#include <flow/app/string_builder.h>
 	#include <flow/flowcore.h>
+	#include <flow/core/xmltree.h>
 }
 
 #define NAME_SIZE (64)
@@ -62,7 +63,6 @@ class XMLNode
 public:
 	/// Create a new XML node with the specified name
 	XMLNode(char *_name);
-
 	~XMLNode();
 	
 	/** Create and add a new XMLNode as a child
@@ -107,6 +107,27 @@ private:
 	int attributeCount;
 	int attributesSize;
 	XMLNodeAttribute **attributes;
+
+
+};
+
+class ReadableXMLNode
+{
+public:
+	ReadableXMLNode(TreeNode _wrap);
+	ReadableXMLNode(const char *_name);
+
+	ReadableXMLNode getChild(char *path);
+
+	const char *getName();
+
+	const char *getValue();
+	int getIntegerValue();
+	float getFloatValue();
+
+private:
+	TreeNode wrap;
+	const char *name;
 };
 
 #endif

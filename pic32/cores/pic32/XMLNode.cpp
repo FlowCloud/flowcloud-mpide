@@ -62,7 +62,6 @@ XMLNode::XMLNode(char *_name) : childrenSize(0), childCount(0),
 	content[0] = '\0';
 }
 
-
 XMLNode::~XMLNode()
 {
 
@@ -176,3 +175,55 @@ StringBuilder XMLNode::appendTo(StringBuilder builder)
 
 
 
+
+
+ReadableXMLNode::ReadableXMLNode(TreeNode _wrap) :
+								wrap(_wrap), name(NULL)
+{
+}
+
+ReadableXMLNode::ReadableXMLNode(const char *_name) :
+								wrap(NULL), name(_name)
+{
+}
+
+ReadableXMLNode ReadableXMLNode::getChild(char *path)
+{
+	return ReadableXMLNode(TreeNode_Navigate(wrap, path));
+}
+
+const char *ReadableXMLNode::getName()
+{
+	if (name)
+	{
+		return name;
+	} 
+	else
+	{
+		return TreeNode_GetName(wrap);
+	}
+}
+
+const char *ReadableXMLNode::getValue()
+{
+	if (name)
+	{
+		return "";
+	} 
+	else
+	{
+		return (const char*)TreeNode_GetValue(wrap);
+	}
+}
+int ReadableXMLNode::getIntegerValue()
+{
+	int r;
+	sscanf(getValue(), "%d", r);
+	return r;
+}
+float ReadableXMLNode::getFloatValue()
+{
+	float r;
+	sscanf(getValue(), "%f", r);
+	return r;
+}

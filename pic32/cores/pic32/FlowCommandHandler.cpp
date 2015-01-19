@@ -19,22 +19,22 @@ extern "C"
   #include <flow/flowcore.h>
 }
 
-bool CommandHandler::attach(const char *command, CommandCallbackFunction callback)
+bool CommandHandler::attach(char *command, CommandCallbackFunction callback)
 {
 	_SYS_CONSOLE_PRINT("Attaching command handler for \"%s\"\r\n", command);
 	bool added = false;
 	if (callbackCount < MAXCALLBACKS)
 	{
-		callbacks[callbackCount].command = command;
+		strncpy(callbacks[callbackCount].command, command, COMMAND_MAX_LENGTH);
 		callbacks[callbackCount++].callback = callback;
 		added = true;
 	}
 	return added;
 }
 
-bool CommandHandler::handleCommand(char* command, XMLNode &response)
+bool CommandHandler::handleCommand(char* command, ReadableXMLNode &params, XMLNode &response)
 {
-	_SYS_CONSOLE_PRINT("CommandHandler::handleCommand(\"%s\", NULL)\r\n", command);
+	_SYS_CONSOLE_PRINT("CommandHandler::handleCommand(\"%s\", %p)\r\n", command, &response);
 	bool handled = false;
 	for(int i = 0; i < callbackCount; ++i)
 	{
@@ -43,7 +43,7 @@ bool CommandHandler::handleCommand(char* command, XMLNode &response)
 				&& strlen(command) == callbackCommandLength)
 		{
 			_SYS_CONSOLE_PRINT("\tCalling command handler for \"%s\"\r\n", callbacks[i].command);
-			callbacks[i].callback(response);
+			callbacks[i].callback(params, response);
 
 			handled = true;
 			break;
