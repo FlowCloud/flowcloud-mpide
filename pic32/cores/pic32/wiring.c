@@ -110,6 +110,13 @@ uint8_t ppsGlobalLock = false;
 //************************************************************************
 #ifdef _FLOWCLOUD_
 unsigned long sketch_start = 0;
+void reset_millis()
+{
+	// reset sketch start time to 0 so that the next call to millis() is accurate to 
+	// millis since power-on
+	sketch_start = 0;
+	sketch_start = millis();
+}
 unsigned long millis()
 {
 	return (FlowTimer_GetTickCount() * 1000) / FlowTimer_GetTicksPerSecond() - sketch_start;
@@ -187,8 +194,8 @@ unsigned long	startMicros	=	micros();
 void init()
 {
 	#ifdef _FLOWCLOUD_
+	reset_millis();
 	__PIC32_pbClk = getPeripheralClock();
-	sketch_start = millis();
 	#else
 
 #if defined(DEAD)

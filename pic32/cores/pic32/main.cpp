@@ -225,6 +225,8 @@ void Arduino_AppTask(FlowThread thread, void *taskParameters)
 	digitalWrite(PIN_LED3, LOW);
 	digitalWrite(PIN_LED4, LOW);
 
+	// call init a second time to reset millis()
+	init();
 	setup();
 	
 	for (;;)
