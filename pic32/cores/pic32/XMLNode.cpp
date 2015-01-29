@@ -16,7 +16,7 @@ void doubleToStr(char *str, size_t len, double value, int places)
 	int intValue = int(value);
 	if (places > 0)
 	{
-		int decimalPart = abs(int((value - intValue)*places));
+		int decimalPart = abs(int((value - intValue)*pow(10, places)));
 		snprintf(str, len, "%d.%d", intValue, decimalPart);
 	} else 
 	{
@@ -108,28 +108,25 @@ XMLNode &XMLNode::addChild(char *childName)
 }
 
 
-XMLNodeAttribute XMLNode::addAttribute(char *_name, char *_value)
+void XMLNode::addAttribute(char *_name, char *_value)
 {
 	checkArraySizes();
 	XMLNodeAttribute *attribute = new XMLNodeAttribute(_name, _value);
 	attributes[attributeCount++] = attribute;
-	return *attribute;
 }
 
-XMLNodeAttribute XMLNode::addAttribute(char *_name, int _value)
+void XMLNode::addAttribute(char *_name, int _value)
 {
 	checkArraySizes();
 	XMLNodeAttribute *attribute = new XMLNodeAttribute(_name, _value);
 	attributes[attributeCount++] = attribute;
-	return *attribute;
 }
 
-XMLNodeAttribute XMLNode::addAttribute(char *_name, double _value, int places)
+void XMLNode::addAttribute(char *_name, double _value, int places)
 {
 	checkArraySizes();
 	XMLNodeAttribute *attribute = new XMLNodeAttribute(_name, _value, places);
 	attributes[attributeCount++] = attribute;
-	return *attribute;
 }
 
 
@@ -218,12 +215,12 @@ const char *ReadableXMLNode::getValue()
 int ReadableXMLNode::getIntegerValue()
 {
 	int r;
-	sscanf(getValue(), "%d", r);
+	sscanf(getValue(), "%d", &r);
 	return r;
 }
-float ReadableXMLNode::getFloatValue()
+double ReadableXMLNode::getFloatValue()
 {
-	float r;
-	sscanf(getValue(), "%f", r);
+	double r;
+	sscanf(getValue(), "%lf", &r);
 	return r;
 }

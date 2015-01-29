@@ -14,8 +14,8 @@ chipkit_WiFire_Flow.ldscript=MZ-application-32MZ2048ECX.ld
 #-Wl,--defsym,_min_heap_size=1
 #-Wl,--wrap=malloc::-Wl,--wrap=strdup::-Wl,--wrap=free::-Wl,--wrap=calloc::-Wl,--wrap=realloc::
 #::-Wl,-Map=out.map
-chipkit_WiFire_Flow.compiler.c.elf.flags=-O1::-Wl,--wrap=UIControl_UIStep::-Wl,--wrap=UIControl_SetLEDMode::-Wl,--wrap=UIControl_SetLEDState::-Wl,--defsym,_min_heap_size=449000::-Wl,--gc-sections::-mdebugger::-mno-peripheral-libs::-nostartfiles::./hardware/pic32/variants/WiFire_Flow/system_interrupt.o::./hardware/pic32/variants/WiFire_Flow/system_init.o::./hardware/pic32/variants/WiFire_Flow/libappbase.X.a::./hardware/pic32/variants/WiFire_Flow/libflowmessaging.X.a::./hardware/pic32/variants/WiFire_Flow/libflowcore.X.a::./hardware/pic32/variants/WiFire_Flow/libcyassl.X.a
-#::./hardware/pic32/compiler/pic32-tools/pic32mx/lib/fpmod32.o
+chipkit_WiFire_Flow.compiler.c.elf.flags=-O1::-Wl,--wrap=UIControl_UIStep::-Wl,--wrap=UIControl_SetLEDMode::-Wl,--wrap=UIControl_SetLEDState::-Wl,--defsym,_min_heap_size=449000::-Wl,--gc-sections::-mdebugger::-mno-peripheral-libs::-nostartfiles::./hardware/pic32/variants/WiFire_Flow/system_interrupt.o::./hardware/pic32/variants/WiFire_Flow/system_init.o::./hardware/pic32/variants/WiFire_Flow/libappbase.X.a::./hardware/pic32/variants/WiFire_Flow/libflowmessaging.X.a::./hardware/pic32/variants/WiFire_Flow/libflowcore.X.a::./hardware/pic32/variants/WiFire_Flow/libcyassl.X.a::./hardware/pic32/variants/WiFire_Flow/libm/lib_a-s_frexp.o::-Wl,--allow-multiple-definition::./hardware/pic32/variants/WiFire_Flow/xc32/libc.a::./hardware/pic32/variants/WiFire_Flow/xc32/libe.a::./hardware/pic32/variants/WiFire_Flow/xc32/libm.a
+
 
 
 chipkit_WiFire_Flow.upload.protocol=stk500v2

@@ -8,6 +8,7 @@
 #ifndef XMLNode_h
 #define XMLNode_h
 
+#include <console.h>
 extern "C" {
 	#include <flow/app/string_builder.h>
 	#include <flow/flowcore.h>
@@ -65,20 +66,18 @@ public:
 	XMLNode(char *_name);
 	~XMLNode();
 	
-	/** Create and add a new XMLNode as a child
-	  * @param childName the name of the child XMLNode
-	  * @return a reference to the newly added child */
+	/// Create and add a new XMLNode as a child
 	XMLNode &addChild(char *childName);
 
+	
 	/// Add an attribute with the specified name and value
-	XMLNodeAttribute addAttribute(char *name, char *value);
+	void addAttribute(char *name, char *value);
 
-	/// Add an attribute with the specified name and value
-	XMLNodeAttribute addAttribute(char *name, int value);
+	/// Add an attribute with the specified name and integer value
+	void addAttribute(char *name, int value);
 
-	/** Add an attribute with the specified name and value. 
-	  * Value will be truncated to the specified number of decimal places */
-	XMLNodeAttribute addAttribute(char *name, double value, int places);
+	/// Add an attribute with the specified name and decimal value, truncated to the specified number of decimal places
+	void addAttribute(char *name, double value, int places);
 
 
 	/// Set the content to the specified content
@@ -90,8 +89,7 @@ public:
 	/// Set the content to the specified content
 	void setContent(double content, int places);
 
-	/** Append the string representation of this XML node with all attributes,
-	  * contents and children to the specified StringBuilder */
+	/// Append the string representation of this XML node with all attributes, contents and children to the specified StringBuilder
 	StringBuilder appendTo(StringBuilder builder);
 
 private:
@@ -123,7 +121,7 @@ public:
 
 	const char *getValue();
 	int getIntegerValue();
-	float getFloatValue();
+	double getFloatValue();
 
 private:
 	TreeNode wrap;
