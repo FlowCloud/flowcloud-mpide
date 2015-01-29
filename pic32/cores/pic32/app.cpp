@@ -1,3 +1,4 @@
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -101,18 +102,8 @@ void MessageReceived (FlowMessagingMessage message)
 			if(node)
 				cmdDetails = (char*) TreeNode_GetValue(node);
 
-			node = TreeNode_Navigate(rootNode, "command/commandparams");
-			if(node)
-				cmdParams = (char*) TreeNode_GetValue(node);
-
-
-			/*_SYS_CONSOLE_PRINT("* cmdTo = %s\r\n", cmdTo);
-			_SYS_CONSOLE_PRINT("* cmdFrom = %s\r\n", cmdFrom);
-			_SYS_CONSOLE_PRINT("* cmdRequestID = %s\r\n", cmdRequestID);
-			_SYS_CONSOLE_PRINT("* cmdRequestClientID = %s\r\n", cmdRequestClientID);
-			_SYS_CONSOLE_PRINT("* cmdDetails = %s\r\n", cmdDetails);*/
-
-
+			cmdParams = TreeNode_Navigate(rootNode, "command/commandparams");
+			
 			if (cmdTo && cmdFrom && cmdRequestID && cmdRequestClientID && cmdDetails)
 			{
 				XMLNode response("response");
@@ -144,19 +135,19 @@ void MessageReceived (FlowMessagingMessage message)
 
 				XMLNode &responsecode = response.addChild("responsecode");
 
-				XMLNode &responseparameters = response.addChild("responseparameters");
+				XMLNode &responseparams = response.addChild("responseparams");
 
 				ReadableXMLNode *paramsNode;
-				if (cmdParams)
+				if (cmdParams && TreeNode_GetChild(cmdParams, 0))
 				{
-					paramsNode = new ReadableXMLNode(cmdParams);
+					paramsNode = new ReadableXMLNode(TreeNode_GetChild(cmdParams, 0));
 				} 
 				else
 				{
-					paramsNode = new ReadableXMLNode("responseparameters");
+					paramsNode = new ReadableXMLNode("commandparams");
 				}
 
-				if (FlowCommandHandler.handleCommand(cmdDetails, *paramsNode, responseparameters))
+				if (FlowCommandHandler.handleCommand(cmdDetails, *paramsNode, responseparams))
 				{
 					responsecode.setContent("OK");
 				} 
