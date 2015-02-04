@@ -44,7 +44,6 @@ public:
 
 	/** handle the command 
 	  * @param command the command to handle
-	  * @param response the buffer to write a response into
 	  * @return true if the command was recognized, false otherwise */
 	bool handleCommand(char* command, ReadableXMLNode &params, XMLNode &response);
 private:
