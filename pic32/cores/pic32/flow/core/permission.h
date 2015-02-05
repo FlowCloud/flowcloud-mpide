@@ -24,7 +24,6 @@
 #include "flow/core/flow_object.h"
 #include "flow/core/flow_object_methods.h"
 #include "flow/core/permission_type.h"
-#include "flow/core/permissionname_type.h"
 #include "flow/core/xml_serialisation.h"
 /**
  * \memberof FlowPermission
@@ -45,11 +44,30 @@ static inline void  FlowPermission_RegisterType()
 	if(!FlowXMLDeserialiser_IsRegisteredType(FlowType_Permission))
 	{
 		FlowXMLDeserialiser_RegisterType(FlowType_Permission, "Permission", 3, 0);
+		FlowXMLDeserialiser_RegisterTypeProperty(FlowType_Permission, _FlowPermission_Name, FlowType_String, "Name", true);
 		FlowXMLDeserialiser_RegisterTypeProperty(FlowType_Permission, _FlowPermission_ExpiryDate, FlowType_Datetime, "ExpiryDate", true);
 		FlowXMLDeserialiser_RegisterTypeProperty(FlowType_Permission, _FlowPermission_Valid, FlowType_Boolean, "Valid", true);
-		FlowXMLDeserialiser_RegisterTypeProperty(FlowType_Permission, _FlowPermission_Name, FlowType_PermissionName, "Name", true);
 	}
 }
+/**
+ * \memberof FlowPermission
+ * \brief Indicates whether the property Name is set on this object.
+ * 
+ * Can be used to check whether Name is available on this object without making an HTTP call.
+ * \param self Object on which the method will be applied
+*/
+static inline bool FlowPermission_HasName(FlowPermission self) { return FlowObject_HasProperty(self, _FlowPermission_Name);}
+/**
+ * \memberof FlowPermission
+ * \param self Object on which the method will be applied
+*/
+static inline char *FlowPermission_GetName(FlowPermission self) { return FlowObject_GetStringProperty(self, _FlowPermission_Name);}
+/**
+ * \memberof FlowPermission
+ * \param self Object on which the method will be applied
+ * \param value new value for this property
+*/
+static inline void  FlowPermission_SetName(FlowPermission self, char *value) { FlowObject_SetStringProperty(self, _FlowPermission_Name, value);}
 /**
  * \memberof FlowPermission
  * \brief Indicates whether the property ExpiryDate is set on this object.
@@ -88,23 +106,4 @@ static inline bool FlowPermission_GetValid(FlowPermission self) { return FlowObj
  * \param value new value for this property
 */
 static inline void  FlowPermission_SetValid(FlowPermission self, bool value) { FlowObject_SetBooleanProperty(self, _FlowPermission_Valid, value);}
-/**
- * \memberof FlowPermission
- * \brief Indicates whether the property Name is set on this object.
- * 
- * Can be used to check whether Name is available on this object without making an HTTP call.
- * \param self Object on which the method will be applied
-*/
-static inline bool FlowPermission_HasName(FlowPermission self) { return FlowObject_HasProperty(self, _FlowPermission_Name);}
-/**
- * \memberof FlowPermission
- * \param self Object on which the method will be applied
-*/
-static inline FlowPermissionName FlowPermission_GetName(FlowPermission self) { return (FlowPermissionName)FlowObject_GetIntegerProperty(self, _FlowPermission_Name);}
-/**
- * \memberof FlowPermission
- * \param self Object on which the method will be applied
- * \param value new value for this property
-*/
-static inline void  FlowPermission_SetName(FlowPermission self, FlowPermissionName value) { FlowObject_SetIntegerProperty(self, _FlowPermission_Name, value);}
 #endif /* FLOW_USERS_PERMISSION_H_ */

@@ -1,4 +1,6 @@
 #include "console.h"
+
+#include <stdarg.h>
 	
 // allow _SYS_* .c functions to call Serial.* functions
 void Serial_print(const char *str)
@@ -21,101 +23,22 @@ void Serial_write(uint8_t c)
 
 bool g_EnableConsole = false;
 bool g_EnableConsoleInput = false;
-	
-static const char* _sys_excep_tbl[16] =
-{
-	"Int",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"AdEL",
-	"AdES",
-	"IBE",
-	"DBE",
-	"Sys",
-	"Bp",
-	"RI",
-	"CpU",
-	"Ov",
-	"Tr",
-	"Reserved",
-	"Reserved",
-};
 
-bool _SYS_DEBUG_INIT(int debug_port)
+extern "C" 
+{
+
+bool FlowConsole_Init(void)
 {
 	return true;
 }
 
-void _SYS_ASSERT(int linenumber, const char* filename, const char* message)
-{
-	if (g_EnableConsole)
-	{
-		char buff[SYS_CONSOLE_BUFFER_LEN];
-		snprintf(buff, SYS_CONSOLE_BUFFER_LEN, "\nSYS_ASSERT occurred in file %s on line %d. ", filename, linenumber);
-
-		Serial_print(buff);
-		Serial_print(message);
-	}
-	for(;;);
-}
-
-void _SYS_ERROR(int linenumber, const char* filename, const char* message)
-{
-	if (g_EnableConsole)
-	{
-		char buff[SYS_CONSOLE_BUFFER_LEN];
-
-		snprintf(buff, SYS_CONSOLE_BUFFER_LEN, "\nSYS_ERROR occurred in file %s on line %d. ", filename, linenumber);
-
-		Serial_print(buff);
-		Serial_print(message);
-	}
-}
-
-void _SYS_ERROR_PRINT(SYS_ERROR_LEVEL level, const char* format, ...)
-{
-	char buff[SYS_CONSOLE_BUFFER_LEN];
-		va_list args;
-		if( (level) <= SYSTEM_CURRENT_ERROR_LEVEL && g_EnableConsole){
-				va_start( args, format );
-				snprintf(buff, SYS_CONSOLE_BUFFER_LEN, "\nSYS_ERROR_PRINT issued: ");
-				Serial_print(buff);
-				vsnprintf(buff, SYS_CONSOLE_BUFFER_LEN, format, args);
-				Serial_print(buff);
-				va_end( args );
-		}
-}
-
-void _SYS_PRINT(const char* format, ...)
-{
-	char buff[SYS_CONSOLE_BUFFER_LEN];
-	va_list args;
-	va_start( args, format );
-		
-	if (g_EnableConsole)
-	{
-		snprintf(buff, SYS_CONSOLE_BUFFER_LEN, "\nSYS_PRINT issued:");
-			Serial_print(buff);
-			vsnprintf(buff, SYS_CONSOLE_BUFFER_LEN, format, args);
-			Serial_print(buff);
-	}
-
-	va_end( args );
-}
-
-bool _SYS_CONSOLE_INIT(int console_port)
-{
-	return true;
-}
-
-void _SYS_CONSOLE_PRINT(const char* format, ...)
+void FlowConsole_Printf(const char* format, ...)
 {
 	va_list arg_list;
-	char buff[SYS_CONSOLE_BUFFER_LEN];
+	char buff[FLOW_CONSOLE_BUFFER_LEN];
 
 	va_start(arg_list, format);
-	vsnprintf(buff, SYS_CONSOLE_BUFFER_LEN, format, arg_list);
+	vsnprintf(buff, FLOW_CONSOLE_BUFFER_LEN, format, arg_list);
 
 	if (g_EnableConsole) 
 	{
@@ -125,7 +48,7 @@ void _SYS_CONSOLE_PRINT(const char* format, ...)
 	va_end(arg_list);
 }
 
-void _SYS_CONSOLE_MESSAGE(const char* msg)
+void FlowConsole_Puts(const char* msg)
 {
 	if (g_EnableConsole) 
 	{
@@ -133,7 +56,7 @@ void _SYS_CONSOLE_MESSAGE(const char* msg)
 	}
 }
 
-bool _SYS_CONSOLE_DATA_RDY()
+bool FlowConsole_Ready()
 {
 	bool ready = false;
 	if (g_EnableConsole && g_EnableConsoleInput)
@@ -143,7 +66,7 @@ bool _SYS_CONSOLE_DATA_RDY()
 	return ready;
 }
 
-char _SYS_CONSOLE_GETC()
+char FlowConsole_Getc()
 {
 	char c = '\0';
 	if (g_EnableConsole && g_EnableConsoleInput)
@@ -157,7 +80,7 @@ char _SYS_CONSOLE_GETC()
 	return c;
 }
 
-void _SYS_CONSOLE_PUTC(char c)
+void FlowConsole_Putc(char c)
 {
 	if (g_EnableConsole)
 	{
@@ -165,7 +88,7 @@ void _SYS_CONSOLE_PUTC(char c)
 	}
 }
 
-int _SYS_CONSOLE_GETLINE(char* buffer, int length)
+int FlowConsole_Getline(char* buffer, int length)
 {
 	if (g_EnableConsole && g_EnableConsoleInput)
 	{
@@ -196,7 +119,7 @@ int _SYS_CONSOLE_GETLINE(char* buffer, int length)
 	return 0;
 }
 
-int _SYS_CONSOLE_SCANF(const char *format, ...)
+int FlowConsole_Scanf(const char *format, ...)
 {
 	va_list arg_list;
 	va_start(arg_list, format);
@@ -204,12 +127,12 @@ int _SYS_CONSOLE_SCANF(const char *format, ...)
 	{
 		int i=0;
 		int result;
-		char buff[SYS_CONSOLE_BUFFER_LEN];
+		char buff[FLOW_CONSOLE_BUFFER_LEN];
 		
-		while(i < SYS_CONSOLE_BUFFER_LEN)
+		while(i < FLOW_CONSOLE_BUFFER_LEN)
 		{
-			buff[i] = _SYS_CONSOLE_GETC();
-			_SYS_CONSOLE_PUTC(buff[i]);
+			buff[i] = FlowConsole_Getc();
+			Serial_write(buff[i]);
 			if(buff[i] == '\n' || buff[i] == '\r')
 				break;
 			i++;
@@ -219,4 +142,32 @@ int _SYS_CONSOLE_SCANF(const char *format, ...)
 	}
 	va_end(arg_list);
 	return 0;
+}
+
+//These are duplicates of the above functions for deprecation.
+
+void SYS_CONSOLE_MESSAGE(const char * message)
+{
+	if (g_EnableConsole) 
+	{
+		Serial_print(message);
+	}
+}
+
+void SYS_CONSOLE_PRINT(const char* format, ...)
+{
+	va_list arg_list;
+	char buff[FLOW_CONSOLE_BUFFER_LEN];
+
+	va_start(arg_list, format);
+	vsnprintf(buff, FLOW_CONSOLE_BUFFER_LEN, format, arg_list);
+
+	if (g_EnableConsole) 
+	{
+		Serial_print(buff);
+	}
+
+	va_end(arg_list);
+}
+
 }

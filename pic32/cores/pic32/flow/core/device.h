@@ -20,8 +20,6 @@
 #define FLOW_USERS_DEVICE_H_
 #include "flow/core/authenticationtokencreatedresponse_type.h"
 #include "flow/core/base_types.h"
-#include "flow/core/capabilities_type.h"
-#include "flow/core/capability.h"
 #include "flow/core/datastore_type.h"
 #include "flow/core/device_type.h"
 #include "flow/core/deviceroles_type.h"
@@ -38,6 +36,7 @@
 #include "flow/core/permissions_type.h"
 #include "flow/core/setting_type.h"
 #include "flow/core/settings_type.h"
+#include "flow/core/strings_type.h"
 #include "flow/core/upgrades_type.h"
 #include "flow/core/user_type.h"
 #include "flow/core/users_type.h"
@@ -73,7 +72,7 @@ static inline void  FlowDevice_RegisterType()
 		FlowXMLDeserialiser_RegisterTypeProperty(FlowType_Device, _FlowDevice_CreatedDate, FlowType_Datetime, "CreatedDate", true);
 		FlowXMLDeserialiser_RegisterTypeProperty(FlowType_Device, _FlowDevice_ClaimOwnershipExpiryDate, FlowType_Datetime, "ClaimOwnershipExpiryDate", true);
 		FlowXMLDeserialiser_RegisterTypeProperty(FlowType_Device, _FlowDevice_RegistrationKey, FlowType_Token, "RegistrationKey", true);
-		FlowXMLDeserialiser_RegisterTypeArrayProperty(FlowType_Device, _FlowDevice_Capabilities, "Capabilities", "Capability", FlowType_Capability, FlowType_Capabilities);
+		FlowXMLDeserialiser_RegisterTypeArrayProperty(FlowType_Device, _FlowDevice_Capabilities, "Capabilities", "Capability", FlowType_String, FlowType_Strings);
 		FlowXMLDeserialiser_RegisterTypeArrayProperty(FlowType_Device, _FlowDevice_Permissions, "Permissions", "Permission", FlowType_Permission, FlowType_Permissions);
 		FlowXMLDeserialiser_RegisterTypeLink(FlowType_Device, _FlowDevice_rel_Allfavourites, "allfavourites");
 		FlowXMLDeserialiser_RegisterTypeLink(FlowType_Device, _FlowDevice_rel_Datastores, "datastores");
@@ -338,7 +337,7 @@ static inline bool FlowDevice_HasCapabilities(FlowDevice self) { return FlowObje
  * \memberof FlowDevice
  * \param self Object on which the method will be applied
 */
-static inline FlowCapabilities FlowDevice_GetCapabilities(FlowDevice self) { return (FlowCapabilities)FlowObject_GetObjectProperty(self, _FlowDevice_Capabilities);}
+static inline FlowStrings FlowDevice_GetCapabilities(FlowDevice self) { return (FlowStrings)FlowObject_GetObjectProperty(self, _FlowDevice_Capabilities);}
 /**
  * \memberof FlowDevice
  * \brief Indicates whether the property Permissions is set on this object.

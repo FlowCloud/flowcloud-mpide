@@ -6,22 +6,21 @@
 //TODO: license
 
 #include <FlowCommandHandler.h>
+#include "flow/flow_console.h"
 #include <string.h>
+extern "C"
+{
+  #include <flow/flowcore.h>
+}
 
 CommandHandler::CommandHandler()
 {
 	callbackCount = 0;
 }
 
-extern "C"
-{
-  void _SYS_CONSOLE_PRINT(const char* format, ...);
-  #include <flow/flowcore.h>
-}
-
 bool CommandHandler::attach(char *command, CommandCallbackFunction callback)
 {
-	_SYS_CONSOLE_PRINT("Attaching command handler for \"%s\"\r\n", command);
+	FlowConsole_Printf("Attaching command handler for \"%s\"\r\n", command);
 	bool added = false;
 	if (callbackCount < MAXCALLBACKS)
 	{
@@ -34,7 +33,7 @@ bool CommandHandler::attach(char *command, CommandCallbackFunction callback)
 
 bool CommandHandler::handleCommand(char* command, ReadableXMLNode &params, XMLNode &response)
 {
-	_SYS_CONSOLE_PRINT("CommandHandler::handleCommand(\"%s\", %p)\r\n", command, &response);
+	FlowConsole_Printf("CommandHandler::handleCommand(\"%s\", %p)\r\n", command, &response);
 	bool handled = false;
 	for(int i = 0; i < callbackCount; ++i)
 	{
@@ -42,7 +41,7 @@ bool CommandHandler::handleCommand(char* command, ReadableXMLNode &params, XMLNo
 		if (strncmp(command, callbacks[i].command, callbackCommandLength) == 0
 				&& strlen(command) == callbackCommandLength)
 		{
-			_SYS_CONSOLE_PRINT("\tCalling command handler for \"%s\"\r\n", callbacks[i].command);
+			FlowConsole_Printf("\tCalling command handler for \"%s\"\r\n", callbacks[i].command);
 			callbacks[i].callback(params, response);
 
 			handled = true;

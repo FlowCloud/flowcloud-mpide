@@ -55,6 +55,7 @@ __attribute__((section(".comment"))) void (*__use_force_isr_install)(void) = &__
 
 #include "app.h"
 #include "console.h"
+#include "flow/flow_console.h"
 
 #include <flow/core/flow_threading.h>
 #include <flow/core/flow_timer.h>
@@ -68,14 +69,14 @@ extern "C"
 void * operator new(size_t n)
 {
 #ifdef DEBUG_MEMORY
-	_SYS_CONSOLE_PRINT("@ new(%ld)\r\n", n);
+	FlowConsole_Printf("@ new(%ld)\r\n", n);
 #endif
 	return Flow_MemAlloc(n);
 }
 void operator delete(void * p) throw()
 {
 #ifdef DEBUG_MEMORY
-	_SYS_CONSOLE_PRINT("@ delete(%p)\r\n", p);
+	FlowConsole_Printf("@ delete(%p)\r\n", p);
 #endif
 	Flow_MemSafeFree(p);
 }
@@ -136,12 +137,12 @@ extern "C" {
 	//************************************************************************
 
 	int CommandShow(_CMDIO_DEV_NODE* pCmdIO, int argc, char** argv){
-		_SYS_CONSOLE_PRINT("CommandShow(...) squelched\r\n");
+		FlowConsole_Printf("CommandShow(...) squelched\r\n");
 	}
 
 	bool CommandHandlers_ResetHandler(bool resetToConfigurationMode){
 		// can we use executeSoftReset from wiring.c
-		_SYS_CONSOLE_PRINT("CommandHandlers_ResetHandler(resetToConfigurationMode = %s) squelched\r\n", resetToConfigurationMode ? "true" : "false");
+		FlowConsole_Printf("CommandHandlers_ResetHandler(resetToConfigurationMode = %s) squelched\r\n", resetToConfigurationMode ? "true" : "false");
 	}
 
 
@@ -205,12 +206,12 @@ extern "C" {
 
 void Arduino_AppTask(FlowThread thread, void *taskParameters)
 {
-	_SYS_CONSOLE_PRINT("Initialising Flow connection\r\n");
+	FlowConsole_Printf("Initialising Flow connection\r\n");
 	Initialise_Flow();
 
-	_SYS_CONSOLE_PRINT("\n\r\n\r----------------------------------------------");
-	_SYS_CONSOLE_PRINT("\n\rFlow Android App booting completed. Running...\n\r");
-	_SYS_CONSOLE_PRINT("\n\r\n\r\n\r");
+	FlowConsole_Printf("\n\r\n\r----------------------------------------------");
+	FlowConsole_Printf("\n\rFlow Android App booting completed. Running...\n\r");
+	FlowConsole_Printf("\n\r\n\r\n\r");
 	delay(20);
 
 	Serial.end();
@@ -257,7 +258,7 @@ int main(void)
 	g_EnableConsole = true;
 	g_EnableConsoleInput = true;
 
-	_SYS_CONSOLE_PRINT("System booting - Initialising appcore\r\n");
+	FlowConsole_Printf("System booting - Initialising appcore\r\n");
 
 	g_EnableUIControlLED = true;
 	return APPCORE_init(&info);
@@ -285,33 +286,33 @@ extern "C" {
 			: /* clobber */
 			);
 		void *p = __real_malloc(size);
-		_SYS_CONSOLE_PRINT("# from %p -> __wrap_malloc(%ld) = %p\r\n", r, size, p);
+		FlowConsole_Printf("# from %p -> __wrap_malloc(%ld) = %p\r\n", r, size, p);
 		return p;
 	}
 
 	void __wrap_free(void *ptr)
 	{
-		_SYS_CONSOLE_PRINT("# __wrap_free(%p)\r\n", ptr);
+		FlowConsole_Printf("# __wrap_free(%p)\r\n", ptr);
 		__real_free(ptr);
 	}
 
 	void *__wrap_calloc(size_t nmemb, size_t size)
 	{
 		void *p = __real_calloc(nmemb, size);
-		_SYS_CONSOLE_PRINT("# __wrap_calloc(%ld, %ld) = %p\r\n", nmemb, size, p);
+		FlowConsole_Printf("# __wrap_calloc(%ld, %ld) = %p\r\n", nmemb, size, p);
 		return p;
 	}
 
 	void *__wrap_realloc(void *ptr, size_t size)
 	{
 		void *p = __real_realloc(ptr, size);
-		_SYS_CONSOLE_PRINT("# __wrap_realloc(%p, %ld) = %p\r\n", ptr, size, p);
+		FlowConsole_Printf("# __wrap_realloc(%p, %ld) = %p\r\n", ptr, size, p);
 		return p;
 	}
 	
 	char *__wrap_strdup(const char *s1)
 	{
-		_SYS_CONSOLE_PRINT("# __wrap_strdup(%p)\r\n", s1);
+		FlowConsole_Printf("# __wrap_strdup(%p)\r\n", s1);
 		return __real_strdup(s1);
 	}
 

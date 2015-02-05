@@ -28,8 +28,6 @@
 #include "flow/core/badrequestresponse.h"
 #include "flow/core/base_types.h"
 #include "flow/core/base_types_methods.h"
-#include "flow/core/capabilities.h"
-#include "flow/core/capability.h"
 #include "flow/core/client.h"
 #include "flow/core/common_messaging_defines.h"
 #include "flow/core/common_messaging_main.h"
@@ -57,7 +55,6 @@
 #include "flow/core/devices.h"
 #include "flow/core/devicesettings.h"
 #include "flow/core/devicetype.h"
-#include "flow/core/devicetypename.h"
 #include "flow/core/devicetypes.h"
 #include "flow/core/deviceuserregistrationcredentials.h"
 #include "flow/core/deviceusersettings.h"
@@ -108,7 +105,6 @@
 #include "flow/core/mediastatus.h"
 #include "flow/core/pageinfo.h"
 #include "flow/core/permission.h"
-#include "flow/core/permissionname.h"
 #include "flow/core/permissions.h"
 #include "flow/core/resetpasswordresponse.h"
 #include "flow/core/resourcecreatedresponse.h"
@@ -157,8 +153,6 @@ static inline void FlowCore_RegisterTypes()
 	FlowAuthorisation_RegisterType();
 	FlowAuthorisations_RegisterType();
 	FlowBadRequestResponse_RegisterType();
-	FlowCapabilities_RegisterType();
-	FlowCapability_RegisterType();
 	FlowContact_RegisterType();
 	FlowContactRequest_RegisterType();
 	FlowContactRequests_RegisterType();
@@ -181,7 +175,6 @@ static inline void FlowCore_RegisterTypes()
 	FlowDeviceRoles_RegisterType();
 	FlowDevices_RegisterType();
 	FlowDeviceType_RegisterType();
-	FlowDeviceTypeName_RegisterType();
 	FlowDeviceTypes_RegisterType();
 	FlowDeviceUserRegistrationCredentials_RegisterType();
 	FlowDiscoverable_RegisterType();
@@ -207,7 +200,6 @@ static inline void FlowCore_RegisterTypes()
 	FlowMediaStatus_RegisterType();
 	FlowPageInfo_RegisterType();
 	FlowPermission_RegisterType();
-	FlowPermissionName_RegisterType();
 	FlowPermissions_RegisterType();
 	FlowResetPasswordResponse_RegisterType();
 	FlowResourceCreatedResponse_RegisterType();

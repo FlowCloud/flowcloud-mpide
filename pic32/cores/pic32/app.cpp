@@ -6,7 +6,10 @@
 #include <string.h>
 
 #include "app.h"
+
 #include "FlowCommandHandler.h"
+
+#include "flow/flow_console.h"
 
 extern "C" {
 	#include <flow/app/string_builder.h>
@@ -22,8 +25,6 @@ extern "C" {
 	#include <flow/core/flow_time.h>
 	#include <flow/core/flow_timer.h>
 	#include <flow/core/flow_task_scheduler.h>
-
-	void _SYS_CONSOLE_PRINT(const char* format, ...);
 }
 
 typedef struct
@@ -163,7 +164,7 @@ void MessageReceived (FlowMessagingMessage message)
 				response.appendTo(responseStringBuilder);
 
 				if(!FlowMessaging_ReplyToMessage(message, "text/plain", (char *)StringBuilder_GetCString(responseStringBuilder), StringBuilder_GetLength(responseStringBuilder), 60))
-					_SYS_CONSOLE_PRINT("Error: Sending command response failed...");
+					FlowConsole_Printf("Error: Sending command response failed...");
 
 				StringBuilder_Free(&responseStringBuilder);
 			}
@@ -190,7 +191,7 @@ bool SetupFlowSubscriptions (void)
 	//	/* Register own device-presence callback to receive own presence updates */
 	//	if (!FlowMessaging_subscribe(profile, g_DeviceAoR, FLOW_MESSAGING_EVENTCATEGORY_DEVICE_PRESENCE, (char *) "", 3600, flowEventCallback))
 	//	{
-	//		_SYS_CONSOLE_PRINT("\n\rError: Subscription to own device-presence failed");
+	//		FlowConsole_Printf("\n\rError: Subscription to own device-presence failed");
 	//		result = false;
 	//	}
 
@@ -291,7 +292,7 @@ bool PublishDevicePresence(void)
 void UpdatePresence(FlowTaskID taskID, void *context)
 {
 	if (!PublishDevicePresence())
-		_SYS_CONSOLE_PRINT("\r\nError: Presence update failed\r\n");
+		FlowConsole_Printf("\r\nError: Presence update failed\r\n");
 }
 
 void Initialise_Flow()
@@ -300,7 +301,7 @@ void Initialise_Flow()
 	_DeviceOnlineStatusLock = FlowSemaphore_New(1, 0);
 	if (!_DeviceOnlineStatusLock)
 	{
-		_SYS_CONSOLE_PRINT("Warning: OnlineStatus semaphore could not be initialised. Continuing without sempahore.\n\r");
+		FlowConsole_Printf("Warning: OnlineStatus semaphore could not be initialised. Continuing without sempahore.\n\r");
 	}
 
 	/* Create device */
@@ -329,16 +330,16 @@ void Initialise_Flow()
 		}
 
 		if (gotDeviceAoR)
-			_SYS_CONSOLE_PRINT("\n\rLogged-in device's Flow Messaging identity: '%s'\n\r\n\r", g_DeviceAoR);
+			FlowConsole_Printf("\n\rLogged-in device's Flow Messaging identity: '%s'\n\r\n\r", g_DeviceAoR);
 		else
-			_SYS_CONSOLE_PRINT("\n\rFailed to retrieve device's Flow Messaging identity\n\r\n\r");
+			FlowConsole_Printf("\n\rFailed to retrieve device's Flow Messaging identity\n\r\n\r");
 
 		APP_SetDeviceIsOnline(true);
 		//Flow_ActivityLogWrite(FlowActivityLogLevel_Information, FlowActivityLogCategory_Startup, ActivityLogErrorCode_none, "Device registered successfully");
 	}
 	else
 	{
-		_SYS_CONSOLE_PRINT("Device registration failed...\n\r");
+		FlowConsole_Printf("Device registration failed...\n\r");
 		FlowErrorType errorType = Flow_GetLastError();
 		if (errorType >= FlowError_BadRequest_Min && errorType <= FlowError_BadRequest_Unknown)
 			errorType = FlowError_InvalidArgument;
@@ -378,10 +379,10 @@ void Initialise_Flow()
 	FlowMemoryManager_Free(&memoryManager);
 
 	if (!SetupFlowSubscriptions())
-		_SYS_CONSOLE_PRINT("\r\nError: Subscribe failed\r\n");
+		FlowConsole_Printf("\r\nError: Subscribe failed\r\n");
 
 	if (!PublishDevicePresence())
-		_SYS_CONSOLE_PRINT("\r\nError: Presence update failed\r\n");
+		FlowConsole_Printf("\r\nError: Presence update failed\r\n");
 
 	// Generate a random clientID
 	{

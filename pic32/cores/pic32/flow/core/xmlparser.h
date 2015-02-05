@@ -106,6 +106,7 @@ typedef struct
 	/* Dynamic String for general purpose storage */
 	char							*DynamicString;
 	unsigned int 					DynamicStringSize;
+	unsigned int 					DynamicStringUsed;
 
 	/* Character history */
 	char							CharHistoryBuffer[CHARHISTORY_LENGTH+1];

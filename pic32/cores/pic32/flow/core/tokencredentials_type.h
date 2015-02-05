@@ -31,7 +31,6 @@ typedef enum
 	_FlowTokenCredentials_Password,
 	_FlowTokenCredentials_RememberMe,
 	_FlowTokenCredentials_RememberMeToken,
-	_FlowTokenCredentials_DeviceType,
 }_FlowTokenCredentials_PropertyEnum;
 
 /**

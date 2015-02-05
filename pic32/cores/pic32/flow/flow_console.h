@@ -14,36 +14,37 @@
 
  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
-/** @file */
 
-#ifndef FLOW_USERS_PERMISSION_TYPE_H_
-#define FLOW_USERS_PERMISSION_TYPE_H_
+#ifndef FLOW_CONSOLE_H
+#define	FLOW_CONSOLE_H
 
-#include "flow/core/flow_object.h"
-#include "flow/core/flow_object_methods.h"
-
-/**
- * \internal
-*/
-typedef enum
+#ifdef	__cplusplus
+extern "C"
 {
-	_FlowPermission_Name,
-	_FlowPermission_ExpiryDate,
-	_FlowPermission_Valid,
-}_FlowPermission_PropertyEnum;
+#endif
 
-/**
- * \class FlowPermission
-*/
-typedef FlowObject FlowPermission;
+#include <stdbool.h>
 
-/**
- * \memberof FlowPermission
- * \brief Copies information from a FlowPermission to another.
- *
- * \param self Object on which the method will be applied
- * \param src reference Object to copy from
-*/
-static inline void FlowPermission_CopyFrom(FlowPermission self, FlowPermission src){ FlowObject_CopyFrom(self,src);}
+bool FlowConsole_Init(void);
 
-#endif /* FLOW_USERS_PERMISSION_TYPE_H_ */
+void FlowConsole_Printf(const char* format, ...);
+
+void FlowConsole_Puts(const char* msg);
+
+bool FlowConsole_Ready(void);
+
+char FlowConsole_Getc(void);
+
+void FlowConsole_Putc(char c);
+
+int FlowConsole_Getline(char* line, int bufferLen);
+
+int FlowConsole_Scanf(const char *format, ...);
+
+
+#ifdef	__cplusplus
+}
+#endif
+
+#endif	/* FLOW_CONSOLE_H */
+

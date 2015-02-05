@@ -19,7 +19,6 @@
 #ifndef FLOW_USERS_TOKENCREDENTIALS_H_
 #define FLOW_USERS_TOKENCREDENTIALS_H_
 #include "flow/core/base_types.h"
-#include "flow/core/devicetypename_type.h"
 #include "flow/core/flow_memorymanager.h"
 #include "flow/core/flow_memorymanager_methods.h"
 #include "flow/core/flow_object.h"
@@ -33,7 +32,7 @@
  * You should use the result of this method whenever you need to submit a Object as a \a data parameter.
  * \param memoryManager Memory manager on which the method will be applied
 */
-static inline FlowTokenCredentials FlowTokenCredentials_New(FlowMemoryManager memoryManager){ return (FlowTokenCredentials)FlowMemoryManager_NewObject(memoryManager, 5, 0, FlowType_TokenCredentials);}
+static inline FlowTokenCredentials FlowTokenCredentials_New(FlowMemoryManager memoryManager){ return (FlowTokenCredentials)FlowMemoryManager_NewObject(memoryManager, 4, 0, FlowType_TokenCredentials);}
 /**
  * \memberof FlowTokenCredentials
  * \brief Registers meta data used for (de)serialising FlowTokenCredentials to XML.
@@ -44,12 +43,11 @@ static inline void  FlowTokenCredentials_RegisterType()
 {
 	if(!FlowXMLDeserialiser_IsRegisteredType(FlowType_TokenCredentials))
 	{
-		FlowXMLDeserialiser_RegisterType(FlowType_TokenCredentials, "TokenCredentials", 5, 0);
+		FlowXMLDeserialiser_RegisterType(FlowType_TokenCredentials, "TokenCredentials", 4, 0);
 		FlowXMLDeserialiser_RegisterTypeProperty(FlowType_TokenCredentials, _FlowTokenCredentials_UserName, FlowType_String, "UserName", true);
 		FlowXMLDeserialiser_RegisterTypeProperty(FlowType_TokenCredentials, _FlowTokenCredentials_Password, FlowType_String, "Password", true);
 		FlowXMLDeserialiser_RegisterTypeProperty(FlowType_TokenCredentials, _FlowTokenCredentials_RememberMe, FlowType_Boolean, "RememberMe", true);
 		FlowXMLDeserialiser_RegisterTypeProperty(FlowType_TokenCredentials, _FlowTokenCredentials_RememberMeToken, FlowType_ID, "RememberMeToken", true);
-		FlowXMLDeserialiser_RegisterTypeProperty(FlowType_TokenCredentials, _FlowTokenCredentials_DeviceType, FlowType_DeviceTypeName, "DeviceType", true);
 	}
 }
 /**
@@ -128,23 +126,4 @@ static inline FlowID FlowTokenCredentials_GetRememberMeToken(FlowTokenCredential
  * \param value new value for this property
 */
 static inline void  FlowTokenCredentials_SetRememberMeToken(FlowTokenCredentials self, FlowID value) { FlowObject_SetIDProperty(self, _FlowTokenCredentials_RememberMeToken, value);}
-/**
- * \memberof FlowTokenCredentials
- * \brief Indicates whether the property DeviceType is set on this object.
- * 
- * Can be used to check whether DeviceType is available on this object without making an HTTP call.
- * \param self Object on which the method will be applied
-*/
-static inline bool FlowTokenCredentials_HasDeviceType(FlowTokenCredentials self) { return FlowObject_HasProperty(self, _FlowTokenCredentials_DeviceType);}
-/**
- * \memberof FlowTokenCredentials
- * \param self Object on which the method will be applied
-*/
-static inline FlowDeviceTypeName FlowTokenCredentials_GetDeviceType(FlowTokenCredentials self) { return (FlowDeviceTypeName)FlowObject_GetIntegerProperty(self, _FlowTokenCredentials_DeviceType);}
-/**
- * \memberof FlowTokenCredentials
- * \param self Object on which the method will be applied
- * \param value new value for this property
-*/
-static inline void  FlowTokenCredentials_SetDeviceType(FlowTokenCredentials self, FlowDeviceTypeName value) { FlowObject_SetIntegerProperty(self, _FlowTokenCredentials_DeviceType, value);}
 #endif /* FLOW_USERS_TOKENCREDENTIALS_H_ */
