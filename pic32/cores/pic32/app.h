@@ -6,6 +6,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+#include <Arduino.h>
+
 #define PRESENCE_REFRESH_PERIOD_SECONDS			(20)
 #define PRESENCE_EXPIRY_PERIOD_SECONDS			(30)
 #define CLIENTID_CHAR_LENGTH					(5)
@@ -36,13 +38,9 @@ extern "C"  {
 }
 #endif
 
-
-
 // app_core.h which depends on harmony headers
 extern "C" void SYS_Uptime (SYS_UPTIME* uptime);
 extern "C" void APP_SoftwareReset(bool resetToConfigurationMode);
-
-extern char g_ClientID[CLIENTID_CHAR_LENGTH+1];
 
 bool PublishDevicePresence();
 void Initialise_Flow();

@@ -3,6 +3,23 @@
 #define WProgram_h
 #ifdef _FLOWCLOUD_
 #include <console.h>
+
+
+/*****************************************************************************
+ FlowCloud objects.
+
+  Summary:
+    Contains FlowCloud-related data.
+
+  Description:
+    These variables keep track of FlowCloud related data that does not change during a session.
+*/
+#define CLIENTID_CHAR_LENGTH                (5)
+
+extern char *g_DeviceAoR;
+extern char g_ClientID[CLIENTID_CHAR_LENGTH+1];
+extern char *g_OwnerAoR;
+extern char *g_OwnerID;
 #endif
 
 #include <stdlib.h>
