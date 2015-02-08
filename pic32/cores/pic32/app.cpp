@@ -27,6 +27,7 @@ extern "C" {
 	#include <flow/core/flow_task_scheduler.h>
 }
 
+#define DATETIME_UTC_FORMAT "%Y-%m-%dT%H:%M:%SZ"
 typedef struct
 {
 	char*	DeviceID;
@@ -166,21 +167,10 @@ void MessageReceived (FlowMessagingMessage message)
 
 bool SetupFlowSubscriptions (void)
 {
-
-	bool result = true;
-
 	/* Register own asynchronous-message callback to receive incoming commands */
 	FlowMessaging_SetMessageReceivedListenerForDevice(MessageReceived);
 
-	// Test code -- not required for Flow Starter App
-	//	/* Register own device-presence callback to receive own presence updates */
-	//	if (!FlowMessaging_subscribe(profile, g_DeviceAoR, FLOW_MESSAGING_EVENTCATEGORY_DEVICE_PRESENCE, (char *) "", 3600, flowEventCallback))
-	//	{
-	//		FlowConsole_Printf("\n\rError: Subscription to own device-presence failed");
-	//		result = false;
-	//	}
-
-	return result;
+	return true;
 }
 
 bool PublishDevicePresence(void)

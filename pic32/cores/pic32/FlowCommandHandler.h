@@ -51,7 +51,7 @@ private:
 	CommandBinding callbacks[MAXCALLBACKS];
 };
 
-/** The \ref CommandHandler used for handling command from Flow */
+/** The \ref CommandHandler used for handling commands from Flow */
 extern CommandHandler FlowCommandHandler;
 
 #endif

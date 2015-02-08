@@ -30,12 +30,12 @@
 //*	Oct 12,	2010	Got MPLAB X working on MacOSX 1.6 for the first time
 //* Dec 12, 2011 <GeneApperson> added call to _scheduleTask() before call
 //*					to loop().
+//* Feb 09, 2015	Added support for FlowCloud on Arduino
 //************************************************************************
 
 //!!! This section is a read only section !!!
 
 #define OPT_SYSTEM_INTERNAL
-//#define DEBUG_MEMORY
 
 #include <System_Defs.h>
 
@@ -68,16 +68,10 @@ extern "C"
 
 void * operator new(size_t n)
 {
-#ifdef DEBUG_MEMORY
-	FlowConsole_Printf("@ new(%ld)\r\n", n);
-#endif
 	return Flow_MemAlloc(n);
 }
 void operator delete(void * p) throw()
 {
-#ifdef DEBUG_MEMORY
-	FlowConsole_Printf("@ delete(%p)\r\n", p);
-#endif
 	Flow_MemSafeFree(p);
 }
 
@@ -136,15 +130,13 @@ extern "C" {
 	// Implement required functions for libappbase
 	//************************************************************************
 
-	int CommandShow(_CMDIO_DEV_NODE* pCmdIO, int argc, char** argv){
-		FlowConsole_Printf("CommandShow(...) squelched\r\n");
-	}
+	extern "C" void APP_SoftwareReset(bool);
 
-	bool CommandHandlers_ResetHandler(bool resetToConfigurationMode){
-		// can we use executeSoftReset from wiring.c
-		FlowConsole_Printf("CommandHandlers_ResetHandler(resetToConfigurationMode = %s) squelched\r\n", resetToConfigurationMode ? "true" : "false");
+	bool SoftwareReset(bool resetToConfigurationMode)
+	{
+		APP_SoftwareReset(resetToConfigurationMode);
+		return false;
 	}
-
 
 	//************************************************************************
 	// Intercept UI task's access to the LEDs to Arduino can have full controll
@@ -210,7 +202,7 @@ void Arduino_AppTask(FlowThread thread, void *taskParameters)
 	Initialise_Flow();
 
 	FlowConsole_Printf("\n\r\n\r----------------------------------------------");
-	FlowConsole_Printf("\n\rFlow Android App booting completed. Running...\n\r");
+	FlowConsole_Printf("\n\rFlow booting completed. Running Arduino sketch...\n\r");
 	FlowConsole_Printf("\n\r\n\r\n\r");
 	delay(20);
 
@@ -241,9 +233,9 @@ void Arduino_AppTask(FlowThread thread, void *taskParameters)
 static APP_info info =
 {
 	Arduino_AppTask,
-	CommandShow,
 	NULL,
-	CommandHandlers_ResetHandler
+	NULL,
+	SoftwareReset
 };
 
 int main(void)
@@ -263,63 +255,6 @@ int main(void)
 	g_EnableUIControlLED = true;
 	return APPCORE_init(&info);
 }
-
-#ifdef DEBUG_MEMORY
-#ifdef __cplusplus
-extern "C" {
-#endif
-	
-	void *__real_malloc(size_t size);
-	void __real_free(void *ptr);
-	void *__real_calloc(size_t nmemb, size_t size);
-	void *__real_realloc(void *ptr, size_t size);
-	char *__real_strdup(const char *s1);
-
-	void *__wrap_malloc(size_t size)
-	{
-		void *r;
-		__asm__ __volatile__ (
-			"lw %0, 28($29)\n"
-			//"addi %0, a0, 0\n"
-			: /* output  */ "=r"(r)
-			: /* input   */
-			: /* clobber */
-			);
-		void *p = __real_malloc(size);
-		FlowConsole_Printf("# from %p -> __wrap_malloc(%ld) = %p\r\n", r, size, p);
-		return p;
-	}
-
-	void __wrap_free(void *ptr)
-	{
-		FlowConsole_Printf("# __wrap_free(%p)\r\n", ptr);
-		__real_free(ptr);
-	}
-
-	void *__wrap_calloc(size_t nmemb, size_t size)
-	{
-		void *p = __real_calloc(nmemb, size);
-		FlowConsole_Printf("# __wrap_calloc(%ld, %ld) = %p\r\n", nmemb, size, p);
-		return p;
-	}
-
-	void *__wrap_realloc(void *ptr, size_t size)
-	{
-		void *p = __real_realloc(ptr, size);
-		FlowConsole_Printf("# __wrap_realloc(%p, %ld) = %p\r\n", ptr, size, p);
-		return p;
-	}
-	
-	char *__wrap_strdup(const char *s1)
-	{
-		FlowConsole_Printf("# __wrap_strdup(%p)\r\n", s1);
-		return __real_strdup(s1);
-	}
-
-#ifdef __cplusplus
-}
-#endif
-#endif
 
 #else
 
