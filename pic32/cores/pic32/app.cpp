@@ -28,6 +28,10 @@ extern "C" {
 }
 
 #define DATETIME_UTC_FORMAT "%Y-%m-%dT%H:%M:%SZ"
+
+// maximum age of commands before they are ignored, in seconds
+#define COMMAND_MAX_AGE 180
+
 typedef struct
 {
 	char*	DeviceID;
@@ -68,93 +72,116 @@ void MessageReceived (FlowMessagingMessage message)
 		char* cmdTo = (char*) TreeNode_GetValue(node);
 		if (node && strcmp(g_DeviceAoR, cmdTo) == 0)
 		{			
-			char *cmdFrom = NULL, *cmdRequestID = NULL, *cmdRequestClientID = NULL, *cmdDetails = NULL;
-			TreeNode cmdParams = NULL;
 
-			node = TreeNode_Navigate(rootNode, "command/from");
-			if(node)
-				cmdFrom = (char*) TreeNode_GetValue(node);
-
-			node = TreeNode_Navigate(rootNode, "command/requestid");
-			if(node)
-				cmdRequestID = (char*) TreeNode_GetValue(node);
-
-			node = TreeNode_Navigate(rootNode, "command/clientid");
-			if(node)
-				cmdRequestClientID = (char*) TreeNode_GetValue(node);
-
-			node = TreeNode_Navigate(rootNode, "command/details");
-			if (!node) 
-				node = TreeNode_Navigate(rootNode, "command/commandtype"); // allow commandtype instead of details as the name
-			if(node)
-				cmdDetails = (char*) TreeNode_GetValue(node);
-
-			cmdParams = TreeNode_Navigate(rootNode, "command/commandparams");
-			
-			if (cmdTo && cmdFrom && cmdRequestID && cmdRequestClientID && cmdDetails)
+			node = TreeNode_Navigate(rootNode, "command/sent");
+			struct tm tm;
+			char *sentNext = NULL;
+			time_t now = Flow_GetTime(NULL);
+			time_t sent;
+			if (node)
 			{
-				XMLNode response("response");
+				sentNext = strptime((char*) TreeNode_GetValue(node), DATETIME_UTC_FORMAT, &tm);
+				if (sentNext)
 				{
-					XMLNode &sent = response.addChild("sent");
-					sent.addAttribute("type", "datetime");
-					#define DATETIME_FIELD_LENGTH 32
-					char datetimeStr[DATETIME_FIELD_LENGTH];
-					time_t currentDateTimeSeconds;
-					Flow_GetTime(&currentDateTimeSeconds);
-					struct tm *currentDateTimeUTC = gmtime(&currentDateTimeSeconds);
-					strftime(datetimeStr, DATETIME_FIELD_LENGTH, "%Y-%m-%dT%H:%M:%SZ", currentDateTimeUTC);
-					sent.setContent(datetimeStr);
-
-					XMLNode &to = response.addChild("to");
-					to.setContent(cmdFrom);
-
-					XMLNode &from = response.addChild("from");
-					from.setContent(g_DeviceAoR);
-
-					XMLNode &requestclientid = response.addChild("requestclientid");
-					requestclientid.addAttribute("type", "integer");
-					requestclientid.setContent(cmdRequestClientID);
-
-					XMLNode &clientid = response.addChild("clientid");
-					clientid.addAttribute("type", "integer");
-					clientid.setContent(cmdRequestID);
+					sent = mktime(&tm);
 				}
-
-				XMLNode &responsecode = response.addChild("responsecode");
-
-				XMLNode &responseparams = response.addChild("responseparams");
-
-				ReadableXMLNode *paramsNode;
-				if (cmdParams && TreeNode_GetChild(cmdParams, 0))
-				{
-					paramsNode = new ReadableXMLNode(TreeNode_GetChild(cmdParams, 0));
-				} 
-				else
-				{
-					paramsNode = new ReadableXMLNode("commandparams");
-				}
-
-				if (FlowCommandHandler.handleCommand(cmdDetails, *paramsNode, responseparams))
-				{
-					responsecode.setContent("OK");
-				} 
-				else 
-				{
-					responsecode.setContent("UNKNOWN_COMMAND");
-				}
-
-				delete paramsNode;
-
-				StringBuilder responseStringBuilder = StringBuilder_New(512);
-				responseStringBuilder = StringBuilder_Append(responseStringBuilder, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-				response.appendTo(responseStringBuilder);
-
-				if(!FlowMessaging_ReplyToMessage(message, "text/plain", (char *)StringBuilder_GetCString(responseStringBuilder), StringBuilder_GetLength(responseStringBuilder), 60))
-					FlowConsole_Printf("Error: Sending command response failed...");
-
-				StringBuilder_Free(&responseStringBuilder);
 			}
 
+
+			// if we couldn't parse the time or it is over COMMAND_MAX_AGE then don't continue
+			if (sentNext && sent > now - COMMAND_MAX_AGE)
+			{
+
+				char *cmdFrom = NULL, *cmdRequestID = NULL, *cmdRequestClientID = NULL, *cmdDetails = NULL;
+				TreeNode cmdParams = NULL;
+
+				node = TreeNode_Navigate(rootNode, "command/from");
+				if(node)
+					cmdFrom = (char*) TreeNode_GetValue(node);
+
+				node = TreeNode_Navigate(rootNode, "command/requestid");
+				if(node)
+					cmdRequestID = (char*) TreeNode_GetValue(node);
+
+				node = TreeNode_Navigate(rootNode, "command/clientid");
+				if(node)
+					cmdRequestClientID = (char*) TreeNode_GetValue(node);
+
+				node = TreeNode_Navigate(rootNode, "command/details");
+				if (!node) 
+					node = TreeNode_Navigate(rootNode, "command/commandtype"); // allow commandtype instead of details as the name
+				if(node)
+					cmdDetails = (char*) TreeNode_GetValue(node);
+
+				cmdParams = TreeNode_Navigate(rootNode, "command/commandparams");
+				
+				if (cmdTo && cmdFrom && cmdRequestID && cmdRequestClientID && cmdDetails)
+				{
+					XMLNode response("response");
+					{
+						XMLNode &sent = response.addChild("sent");
+						sent.addAttribute("type", "datetime");
+						#define DATETIME_FIELD_LENGTH 32
+						char datetimeStr[DATETIME_FIELD_LENGTH];
+						time_t currentDateTimeSeconds;
+						Flow_GetTime(&currentDateTimeSeconds);
+						struct tm *currentDateTimeUTC = gmtime(&currentDateTimeSeconds);
+						strftime(datetimeStr, DATETIME_FIELD_LENGTH, DATETIME_UTC_FORMAT, currentDateTimeUTC);
+						sent.setContent(datetimeStr);
+
+						XMLNode &to = response.addChild("to");
+						to.setContent(cmdFrom);
+
+						XMLNode &from = response.addChild("from");
+						from.setContent(g_DeviceAoR);
+
+						XMLNode &requestclientid = response.addChild("requestclientid");
+						requestclientid.addAttribute("type", "integer");
+						requestclientid.setContent(cmdRequestClientID);
+
+						XMLNode &clientid = response.addChild("clientid");
+						clientid.addAttribute("type", "integer");
+						clientid.setContent(cmdRequestID);
+					}
+
+					XMLNode &responsecode = response.addChild("responsecode");
+
+					XMLNode &responseparams = response.addChild("responseparams");
+
+					ReadableXMLNode *paramsNode;
+					if (cmdParams && TreeNode_GetChild(cmdParams, 0))
+					{
+						paramsNode = new ReadableXMLNode(TreeNode_GetChild(cmdParams, 0));
+					} 
+					else
+					{
+						paramsNode = new ReadableXMLNode("commandparams");
+					}
+
+					if (FlowCommandHandler.handleCommand(cmdDetails, *paramsNode, responseparams))
+					{
+						responsecode.setContent("OK");
+					} 
+					else 
+					{
+						responsecode.setContent("UNKNOWN_COMMAND");
+					}
+
+					delete paramsNode;
+
+					StringBuilder responseStringBuilder = StringBuilder_New(512);
+					responseStringBuilder = StringBuilder_Append(responseStringBuilder, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+					response.appendTo(responseStringBuilder);
+
+					if(!FlowMessaging_ReplyToMessage(message, "text/plain", (char *)StringBuilder_GetCString(responseStringBuilder), StringBuilder_GetLength(responseStringBuilder), 60))
+						FlowConsole_Printf("Error: Sending command response failed...");
+
+					StringBuilder_Free(&responseStringBuilder);
+				}
+
+			} else {
+				FlowConsole_Printf("Ignoring command, sent time is more than %d seconds ago\r\n", COMMAND_MAX_AGE);
+			}
 		}
 	}
 	// else, not a command for us
@@ -206,7 +233,7 @@ bool PublishDevicePresence(void)
 		time_t currentDateTimeSeconds;
 		Flow_GetTime(&currentDateTimeSeconds);
 		struct tm *currentDateTimeUTC = gmtime(&currentDateTimeSeconds);
-		strftime(datetimeStr, DATETIME_FIELD_LENGTH, "%Y-%m-%dT%H:%M:%SZ", currentDateTimeUTC);
+		strftime(datetimeStr, DATETIME_FIELD_LENGTH, DATETIME_UTC_FORMAT, currentDateTimeUTC);
 		doc = StringBuilder_Append(doc, datetimeStr);
 		doc = StringBuilder_Append(doc, "</datetime>");
 
