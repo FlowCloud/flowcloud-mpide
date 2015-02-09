@@ -44,9 +44,9 @@ class XMLNodeAttribute
 friend class XMLNode;
 
 public:
-	XMLNodeAttribute(char *_name, char *_value);
-	XMLNodeAttribute(char *_name, int _value);
-	XMLNodeAttribute(char *_name, double _value, int places);
+	XMLNodeAttribute(const char *_name, const char *_value);
+	XMLNodeAttribute(const char *_name, int _value);
+	XMLNodeAttribute(const char *_name, double _value, int places);
 
 	~XMLNodeAttribute(){};
 protected:
@@ -63,25 +63,25 @@ class XMLNode
 {
 public:
 	/// Create a new XML node with the specified name
-	XMLNode(char *_name);
+	XMLNode(const char *_name);
 	~XMLNode();
 	
 	/// Create and add a new XMLNode as a child
-	XMLNode &addChild(char *childName);
+	XMLNode &addChild(const char *childName);
 
 	
 	/// Add an attribute with the specified name and value
-	void addAttribute(char *name, char *value);
+	void addAttribute(const char *name, const char *value);
 
 	/// Add an attribute with the specified name and integer value
-	void addAttribute(char *name, int value);
+	void addAttribute(const char *name, int value);
 
 	/// Add an attribute with the specified name and decimal value, truncated to the specified number of decimal places
-	void addAttribute(char *name, double value, int places);
+	void addAttribute(const char *name, double value, int places);
 
 
 	/// Set the content to the specified content
-	void setContent(char *content);
+	void setContent(const char *content);
 
 	/// Set the content to the specified content
 	void setContent(int content);

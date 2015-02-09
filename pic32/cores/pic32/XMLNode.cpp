@@ -24,19 +24,19 @@ void doubleToStr(char *str, size_t len, double value, int places)
 	}
 }
 
-XMLNodeAttribute::XMLNodeAttribute(char *_name, char *_value)
+XMLNodeAttribute::XMLNodeAttribute(const char *_name, const char *_value)
 {
 	strncpy(name, _name, NAME_SIZE);
 	strncpy(value, _value, NAME_SIZE);
 }
 
-XMLNodeAttribute::XMLNodeAttribute(char *_name, int _value)
+XMLNodeAttribute::XMLNodeAttribute(const char *_name, int _value)
 {
 	strncpy(name, _name, NAME_SIZE);
 	snprintf(value, NAME_SIZE, "%d", _value);
 }
 
-XMLNodeAttribute::XMLNodeAttribute(char *_name, double _value, int places)
+XMLNodeAttribute::XMLNodeAttribute(const char *_name, double _value, int places)
 {
 	strncpy(name, _name, NAME_SIZE);
 	doubleToStr(value, NAME_SIZE, _value, places);
@@ -54,7 +54,7 @@ StringBuilder XMLNodeAttribute::appendTo(StringBuilder builder)
 	return builder;
 }
 
-XMLNode::XMLNode(char *_name) : childrenSize(0), childCount(0), 
+XMLNode::XMLNode(const char *_name) : childrenSize(0), childCount(0), 
 								attributesSize(0), attributeCount(0),
 								children(NULL), attributes(NULL)
 {
@@ -99,7 +99,7 @@ void XMLNode::checkArraySizes()
 	}
 }
 
-XMLNode &XMLNode::addChild(char *childName)
+XMLNode &XMLNode::addChild(const char *childName)
 {
 	checkArraySizes();
 	XMLNode *child = new XMLNode(childName);
@@ -108,21 +108,21 @@ XMLNode &XMLNode::addChild(char *childName)
 }
 
 
-void XMLNode::addAttribute(char *_name, char *_value)
+void XMLNode::addAttribute(const char *_name, const char *_value)
 {
 	checkArraySizes();
 	XMLNodeAttribute *attribute = new XMLNodeAttribute(_name, _value);
 	attributes[attributeCount++] = attribute;
 }
 
-void XMLNode::addAttribute(char *_name, int _value)
+void XMLNode::addAttribute(const char *_name, int _value)
 {
 	checkArraySizes();
 	XMLNodeAttribute *attribute = new XMLNodeAttribute(_name, _value);
 	attributes[attributeCount++] = attribute;
 }
 
-void XMLNode::addAttribute(char *_name, double _value, int places)
+void XMLNode::addAttribute(const char *_name, double _value, int places)
 {
 	checkArraySizes();
 	XMLNodeAttribute *attribute = new XMLNodeAttribute(_name, _value, places);
@@ -130,7 +130,7 @@ void XMLNode::addAttribute(char *_name, double _value, int places)
 }
 
 
-void XMLNode::setContent(char *_content)
+void XMLNode::setContent(const char *_content)
 {
 	strncpy(content, _content, CONTENT_SIZE);
 }
