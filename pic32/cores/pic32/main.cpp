@@ -131,6 +131,12 @@ extern "C" {
 	//************************************************************************
 
 	extern "C" void APP_SoftwareReset(bool);
+	
+	extern "C" bool CommandHandlers_ResetHandler(bool resetToConfigurationMode)
+	{
+		APP_SoftwareReset(resetToConfigurationMode);
+		return false;
+	}
 
 	bool SoftwareReset(bool resetToConfigurationMode)
 	{
