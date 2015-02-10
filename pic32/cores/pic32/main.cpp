@@ -123,7 +123,6 @@ extern "C" {
 
 	int APPCORE_init(APP_info * info);
 
-	// assuming configUSE_16_BIT_TICKS == 0
 	void vTaskDelay( const uint32_t xTicksToDelay );
 
 	//************************************************************************
@@ -131,7 +130,7 @@ extern "C" {
 	//************************************************************************
 
 	extern "C" void APP_SoftwareReset(bool);
-	
+
 	extern "C" bool CommandHandlers_ResetHandler(bool resetToConfigurationMode)
 	{
 		APP_SoftwareReset(resetToConfigurationMode);

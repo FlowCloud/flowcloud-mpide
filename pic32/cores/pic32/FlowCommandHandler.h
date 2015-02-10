@@ -3,8 +3,6 @@
 //*		Author: Simon Pinfold
 //************************************************************************
 
-//TODO: license
-
 #ifndef FlowCommandHandler_h
 #define FlowCommandHandler_h
 

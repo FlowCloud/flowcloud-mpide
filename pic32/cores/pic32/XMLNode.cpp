@@ -3,8 +3,6 @@
 //*		Author: Simon Pinfold
 //************************************************************************
 
-//TODO: license
-
 #include <XMLNode.h>
 #include <string.h>
 

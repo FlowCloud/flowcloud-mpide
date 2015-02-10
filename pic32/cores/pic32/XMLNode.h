@@ -3,8 +3,6 @@
 //*		Author: Simon Pinfold
 //************************************************************************
 
-//TODO: license
-
 #ifndef XMLNode_h
 #define XMLNode_h
 

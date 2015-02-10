@@ -3,8 +3,6 @@
 //*		Author: Simon Pinfold
 //************************************************************************
 
-//TODO: license
-
 #include <FlowCommandHandler.h>
 #include "flow/flow_console.h"
 #include <string.h>
