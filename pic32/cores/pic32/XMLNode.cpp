@@ -8,18 +8,13 @@
 
 #define abs(x) ((x)<0 ? -(x) : (x))
 
+static PrintBuffer pb(NULL, 0);
 
 void doubleToStr(char *str, size_t len, double value, int places)
 {
-	int intValue = int(value);
-	if (places > 0)
-	{
-		int decimalPart = abs(int((value - intValue)*pow(10, places)));
-		snprintf(str, len, "%d.%d", intValue, decimalPart);
-	} else 
-	{
-		snprintf(str, len, "%d", intValue);
-	}
+	pb.reset(str, len);
+	pb.print(value, places);
+	pb.write('\0');
 }
 
 XMLNodeAttribute::XMLNodeAttribute(const char *_name, const char *_value)
@@ -221,4 +216,16 @@ double ReadableXMLNode::getFloatValue()
 	double r;
 	sscanf(getValue(), "%lf", &r);
 	return r;
+}
+
+void PrintBuffer::write(uint8_t _b)
+{
+	if (i < len)
+	{
+		buffer[i++] = _b;
+		Serial.write(_b);
+	}
+
+	// add null at end of buffer even if we have stopped writing to the buffer
+	if (i == len-1 && _b == '\0') buffer[i] = '\0';
 }

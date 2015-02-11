@@ -6,6 +6,8 @@
 #ifndef XMLNode_h
 #define XMLNode_h
 
+#include "Print.h"
+
 #include <console.h>
 extern "C" {
 	#include <flow/app/string_builder.h>
@@ -124,6 +126,22 @@ public:
 private:
 	TreeNode wrap;
 	const char *name;
+};
+
+
+// print to a buffer
+class PrintBuffer : public Print
+{
+public:
+	PrintBuffer(char *_buffer, size_t _len) : buffer(NULL), len(0), i(0) {};
+	void reset(char *_buffer, size_t _len) { buffer = _buffer; len = _len; i = 0; };
+
+	void write(uint8_t _b);
+
+private:
+	size_t len;
+	size_t i;
+	char *buffer;
 };
 
 #endif
