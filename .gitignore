@@ -29,3 +29,4 @@ pic32/variants/picadillo_35t/
 pic32/variants/quicK240/
 pic32/variants/uC32/
 pic32/variants/uC32_Pmod_Shield/
+pic32/libraries
