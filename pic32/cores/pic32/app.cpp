@@ -1,4 +1,4 @@
-
+#ifdef _FLOWCLOUD_
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -407,3 +407,4 @@ void Initialise_Flow()
 
 }
 
+#endif
