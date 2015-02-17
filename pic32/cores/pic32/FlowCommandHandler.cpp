@@ -31,7 +31,6 @@ bool CommandHandler::attach(char *command, CommandCallbackFunction callback)
 
 bool CommandHandler::handleCommand(char* command, ReadableXMLNode &params, XMLNode &response)
 {
-	FlowConsole_Printf("CommandHandler::handleCommand(\"%s\", %p)\r\n", command, &response);
 	bool handled = false;
 	for(int i = 0; i < callbackCount; ++i)
 	{
@@ -39,7 +38,6 @@ bool CommandHandler::handleCommand(char* command, ReadableXMLNode &params, XMLNo
 		if (strncmp(command, callbacks[i].command, callbackCommandLength) == 0
 				&& strlen(command) == callbackCommandLength)
 		{
-			FlowConsole_Printf("\tCalling command handler for \"%s\"\r\n", callbacks[i].command);
 			callbacks[i].callback(params, response);
 
 			handled = true;
