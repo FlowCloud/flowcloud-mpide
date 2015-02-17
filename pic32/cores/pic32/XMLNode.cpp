@@ -223,7 +223,6 @@ void PrintBuffer::write(uint8_t _b)
 	if (i < len)
 	{
 		buffer[i++] = _b;
-		Serial.write(_b);
 	}
 
 	// add null at end of buffer even if we have stopped writing to the buffer
